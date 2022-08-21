@@ -1,17 +1,25 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+const express = require('express');
+const colors = require('colors');
+const cors = require('cors');
+require('dotenv').config();
+const { graphqlHTTP } = require('express-graphql');
+const schema = require('./schema/schema');
+const connectDB = require('./config/db');
+const port = process.env.PORT || 5000;
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+const app = express();
+
+// Connect to database
+connectDB();
+
+app.use(cors());
+
+app.use(
+  '/graphql',
+  graphqlHTTP({
+    schema,
+    graphiql: process.env.NODE_ENV === 'development',
+  })
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+app.listen(port, console.log(`Server running on port ${port}`));
